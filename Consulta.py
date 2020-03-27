@@ -16,7 +16,7 @@ api_url_base = 'https://api.github.com/graphql'
 
 headers = {
     'Content-Type': 'application/json',
-    'Authorization': 'bearer 76eda44822120be83dcaa3417e667850f01063dd',
+    'Authorization': 'bearer XXXXXXXXXXXXXXXXXXXXXXXXXX',
 }
 
 query = """
