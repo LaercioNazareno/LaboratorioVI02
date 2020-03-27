@@ -16,13 +16,13 @@ api_url_base = 'https://api.github.com/graphql'
 
 headers = {
     'Content-Type': 'application/json',
-    'Authorization': 'bearer 6c36687d3ce57991e214284e239a11a9a6a55eff',
+    'Authorization': 'bearer 76eda44822120be83dcaa3417e667850f01063dd',
 }
 
 query = """
     {
         user(login: "gvanrossum") {
-            repositories(first:24) {
+            repositories(first:24,isFork:false) {
                 nodes {
                     nameWithOwner
                     url
@@ -123,15 +123,16 @@ def save_file(json):
         if node['primaryLanguage'] is not None: 
             linguagem = str(node['primaryLanguage']['name'])
         
-        writer.writerow({"Nome": node['nameWithOwner'],
-                         "url":node['url'],
-                         "Data Criacao":date,
-                         "Data de Atualizacao":node['updatedAt'],
-                         "Linguagem":linguagem,
-                         "Total de releases":node['releases']['totalCount'],
-                         "Idade": idade,
-                         "Tempo de Atualizacao em dias": tempo_atualizacao
-                        })
+        if linguagem == "Python":
+	        writer.writerow({"Nome": node['nameWithOwner'],
+	                         "url":node['url'],
+	                         "Data Criacao":date,
+	                         "Data de Atualizacao":node['updatedAt'],
+	                         "Linguagem":linguagem,
+	                         "Total de releases":node['releases']['totalCount'],
+	                         "Idade": idade,
+	                         "Tempo de Atualizacao em dias": tempo_atualizacao
+	                        })
     file.close()
 
 
