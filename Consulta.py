@@ -8,38 +8,44 @@ import os
 
 
 # Variaveis globais:
-qtd_dados = 24
-qtd_page = 1#if qtd_dados/10 > 0 
+qtd_dados = 1000
+qtd_page = qtd_dados/10 
 qtd_max_buscas = 20
 
 api_url_base = 'https://api.github.com/graphql'
 
 headers = {
     'Content-Type': 'application/json',
-    'Authorization': 'bearer XXXXXXXXXXXXXXXXXXXXXXXXXX',
+    'Authorization': 'bearer 6f1e0aee4b4f247e2ea5abefde02c11d112d3cdb',
 }
 
 query = """
     {
-        user(login: "gvanrossum") {
-            repositories(first:24,isFork:false) {
-                nodes {
-                    nameWithOwner
-                    url
-                    createdAt
-                    updatedAt
-                    releases {
-                        totalCount
-                    }
-                    primaryLanguage {
-                        name
-                    }
-                    forks {
-                        totalCount
-                    }
+        search(query: "stars:>100 language:Python", type: REPOSITORY, first:10{AFTER}) {
+                pageInfo{
+                    hasNextPage
+                    endCursor
                 }
-            }
-        }
+                  nodes {
+                    ... on Repository {
+                       
+                        nameWithOwner
+                        url
+                        createdAt
+                        updatedAt
+                        releases {
+                            totalCount
+                        }
+                        primaryLanguage {
+                            name
+                        }
+                        forks {
+                            totalCount
+                        }
+                    
+                    }
+                  }
+                }
     }
 """
 json = {
@@ -66,8 +72,8 @@ def request(json, n_consulta = 0):
 
 def start():
     respo = initialaze()
-    # result = search(respo)
-    return respo.json()#result
+    result = search(respo)
+    return  result#respo.json()
 
 def initialaze():
     
@@ -99,7 +105,7 @@ def search(result):
     return result
 
 def save_file(json):
-    nodes = json['data']['user']['repositories']['nodes']
+    nodes = json['data']['search']['nodes']
 
     file = open("arquivo.csv", 'w')
     fieldnames = ["Nome","url","Data Criacao","Data de Atualizacao","Total de releases","Linguagem","Idade","Tempo de Atualizacao em dias"]
