@@ -8,13 +8,15 @@ import time
 import os
 import signal, time, random
 
-class TimeoutError (RuntimeError):
+class MyTimeout(Exception):
     pass
 
-def handler (signum, frame):
-    raise TimeoutError()
+def handler(signum, frame):
+    print('Timeout', signum)
+    raise MyTimeout
 
 def downloadRepo():
+	numero = 136
 	with open('arquivo.csv') as repositorios:
 		file = open('arquivo_loc.csv','w')
 		fieldnames = ["Nome","url","Data Criacao","Data de Atualizacao","Total de releases","Linguagem","Idade","Tempo de Atualizacao em dias","Loc"]
@@ -25,23 +27,33 @@ def downloadRepo():
 		for repo in reader:
 			status = 'ok'
 			linhas = 0
+
 			try:
-				signal.alarm (600)
-				print("Baixando repositorio")
+				signal.signal(signal.SIGALRM, handler)
+				signal.alarm(600)
+				print("Baixando repositorio "+ repo['Nome']+""+ str(numero))
 				Git('repositorios').clone(repo['url'])
 				# Analise
 				path = getPath(repo['Nome'])
 				print('analisando o repositorio: '+ repo['Nome'])
 				linhas = int(countlines(path))
 				
-
-			except :
+			except MyTimeout:
+				status = 'falha'
+				print('falha')
+				continue
+			except TimeoutError as exc:
 				repoF.append(repo['url'])
 				status = 'falha'
 				print('falha')
-				#break
-				continue 
+				continue
+			except Exception as e:
+				repoF.append(repo['url'])
+				status = 'falha'
+				print('falha')
+				continue
 			finally:
+				numero += 1
 				csv_writer.writerow({"Nome": repo['Nome'],
 	                         "url": repo['url'],
 	                         "Data Criacao":repo['Data Criacao'],
