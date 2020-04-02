@@ -26,7 +26,7 @@ def downloadRepo():
 			status = 'ok'
 			linhas = 0
 			try:
-				signal.alarm (10)
+				signal.alarm (600)
 				print("Baixando repositorio")
 				Git('repositorios').clone(repo['url'])
 				# Analise
@@ -39,8 +39,8 @@ def downloadRepo():
 				repoF.append(repo['url'])
 				status = 'falha'
 				print('falha')
-				break
-				# continue 
+				#break
+				continue 
 			finally:
 				csv_writer.writerow({"Nome": repo['Nome'],
 	                         "url": repo['url'],
